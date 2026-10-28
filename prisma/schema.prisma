@@ -1,0 +1,129 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id               String       @id @default(cuid())
+  name             String       @default("Untitled Ad Project")
+  status           String       @default("DRAFT") // DRAFT, ANALYZING, BRIEFED, GENERATING, COMPLETED, FAILED
+  targetMarket     String?      @default("MENA")  // MENA, GCC, USA, Europe, Asia
+  platform         String?      @default("Instagram Reels/Stories")
+  aspectRatios     String?      @default("9:16")  // Comma-separated or JSON
+  tone             String?      @default("Luxury")
+  modelType        String?      @default("none")  // none, hands, full
+  modelDescription String?
+  sceneCount       Int          @default(4)       // 4, 8, 12
+  brandColors      String?
+  slogan           String?
+  extraNotes       String?
+  userId           String?      @default("default-user")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  assets           Asset[]
+  analysis         Analysis?
+  scenes           Scene[]
+  jobs             Job[]
+}
+
+model Asset {
+  id          String   @id @default(cuid())
+  projectId   String
+  type        String   // ORIGINAL, CUTOUT, MASK, GENERATED
+  url         String
+  filename    String
+  mimeType    String
+  width       Int?
+  height      Int?
+  size        Int?
+  metadata    String?  // JSON string
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Analysis {
+  id                 String   @id @default(cuid())
+  projectId          String   @unique
+  productName        String
+  category           String
+  materials          String?
+  colors             String?
+  shape              String?
+  keyFeatures        String?
+  brandTextVisible   String?
+  targetAudience     String?
+  priceTier          String?  // Budget, Mid-range, Premium, Ultra-Luxury
+  suggestedMarkets   String?  // JSON array
+  suggestedAngles    String?  // JSON array
+  doNotChange        String   // JSON array of strings
+  rawResponse        String?  // Full JSON raw response
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  project            Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Scene {
+  id               String       @id @default(cuid())
+  projectId        String
+  sceneNumber      Int
+  templateId       String
+  sceneName        String
+  sceneNameAr      String?
+  imagePrompt      String
+  negativePrompt   String?
+  aspectRatio      String       @default("9:16")
+  videoPrompt      String
+  cameraMotion     String
+  durationSeconds  Int          @default(4)
+  motionNotes      String?
+  captionLine      String?
+  voiceoverLine    String?
+  status           String       @default("PENDING") // PENDING, GENERATING, COMPLETED, FAILED
+  activeImageUrl   String?
+  selectedForExport Boolean     @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  project          Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  generations      Generation[]
+}
+
+model Generation {
+  id               String   @id @default(cuid())
+  sceneId          String
+  imageUrl         String
+  promptUsed       String
+  negativePrompt   String?
+  videoPrompt      String?
+  fidelityScore    Float?   // 0.0 - 1.0 (or percentage)
+  fidelityNotes    String?
+  fidelityPassed   Boolean  @default(true)
+  retryCount       Int      @default(0)
+  isCutoutComposite Boolean @default(false)
+  status           String   @default("COMPLETED") // COMPLETED, FAILED
+  createdAt        DateTime @default(now())
+
+  scene            Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  projectId   String
+  type        String   // GENERATE_ALL, REGENERATE_SCENE, EDIT_SCENE, UPSCALE
+  status      String   @default("QUEUED") // QUEUED, PROCESSING, COMPLETED, FAILED
+  progress    Int      @default(0) // 0-100
+  currentStep String?
+  error       String?
+  metadata    String?  // JSON payload
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="watchBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <linearGradient id="titanium" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="30%" stop-color="#64748b"/>
+      <stop offset="70%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="cyberScreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="watchShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="30" stdDeviation="40" flood-color="#000" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#watchBg)"/>
+  <ellipse cx="512" cy="850" rx="270" ry="35" fill="#000" opacity="0.9" filter="blur(25px)"/>
+
+  <g filter="url(#watchShadow)">
+    <!-- Silicone / Fluororubber Strap -->
+    <path d="M 412 100 L 612 100 L 592 350 L 432 350 Z" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+    <path d="M 432 674 L 592 674 L 612 924 L 412 924 Z" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+
+    <!-- Circular Titanium Bezel -->
+    <circle cx="512" cy="512" r="230" fill="url(#titanium)" stroke="#cbd5e1" stroke-width="4"/>
+    <circle cx="512" cy="512" r="215" fill="#0f172a" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.4"/>
+    <circle cx="512" cy="512" r="190" fill="url(#cyberScreen)"/>
+
+    <!-- Digital Chrono Dial -->
+    <circle cx="512" cy="512" r="170" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-dasharray="12 6"/>
+    <text x="512" y="470" text-anchor="middle" fill="#38bdf8" font-family="'Cairo', sans-serif" font-size="20" font-weight="bold" letter-spacing="3">TITANIUM PRO</text>
+    <text x="512" y="540" text-anchor="middle" fill="#ffffff" font-family="monospace" font-size="52" font-weight="900" letter-spacing="4">10:42</text>
+    <text x="512" y="580" text-anchor="middle" fill="#22c55e" font-family="monospace" font-size="16" letter-spacing="2">HEART RATE 72 BPM</text>
+
+    <!-- Side Crown & Sensor Button -->
+    <rect x="742" y="480" width="30" height="64" rx="6" fill="#64748b" stroke="#94a3b8" stroke-width="2"/>
+  </g>
+</svg>
