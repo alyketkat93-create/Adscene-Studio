@@ -46,6 +46,27 @@ export default function StudioHomePage() {
     goToStep(2);
   };
 
+  const handleViewDemoProject = async () => {
+    try {
+      const res = await fetch("/api/projects");
+      const data = await res.json();
+      if (data.projects && data.projects.length > 0) {
+        const demoProj = data.projects[0];
+        const fullRes = await fetch(`/api/projects/${demoProj.id}`);
+        const fullData = await fullRes.json();
+        const p = fullData.project;
+        setProjectId(p.id);
+        setProjectName(p.name);
+        setAssetUrl(p.assets?.[0]?.url || "/demo/perfume.svg");
+        setGeneratedScenes(p.scenes || []);
+        setCurrentStep(5);
+        setMaxStepReached(5);
+      }
+    } catch (e) {
+      console.warn("Could not load demo project:", e);
+    }
+  };
+
   const handleAnalysisConfirmed = (confirmedAnalysis: ProductAnalysis) => {
     setAnalysis(confirmedAnalysis);
     setProjectName(confirmedAnalysis.product_name);
@@ -123,7 +144,10 @@ export default function StudioHomePage() {
 
         <div className="mt-4">
           {currentStep === 1 && (
-            <StepUpload onUploadSuccess={handleUploadSuccess} />
+            <StepUpload
+              onUploadSuccess={handleUploadSuccess}
+              onViewDemoProject={handleViewDemoProject}
+            />
           )}
 
           {currentStep === 2 && projectId && assetUrl && (

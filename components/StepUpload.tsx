@@ -7,9 +7,10 @@ import { useLanguage } from "./LanguageContext";
 
 interface StepUploadProps {
   onUploadSuccess: (data: { projectId: string; assetUrl: string; width: number; height: number; resolutionWarning: boolean }) => void;
+  onViewDemoProject?: () => void;
 }
 
-export default function StepUpload({ onUploadSuccess }: StepUploadProps) {
+export default function StepUpload({ onUploadSuccess, onViewDemoProject }: StepUploadProps) {
   const { t, lang } = useLanguage();
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -141,6 +142,37 @@ export default function StepUpload({ onUploadSuccess }: StepUploadProps) {
           {t.uploadSubtitle}
         </p>
       </div>
+
+      {/* Quick Instant Result Demo Banner */}
+      {onViewDemoProject && (
+        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-zinc-900 to-teal-950/40 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-center gap-3 text-start">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-white block">
+                {lang === "ar"
+                  ? "تريد رؤية النتيجة فوراً؟ مشروع إعلاني كامل جاهز للمعاينة"
+                  : "Want to see instant results? Full AI ad campaign ready"}
+              </span>
+              <span className="text-[11px] text-zinc-400">
+                {lang === "ar"
+                  ? "4 مشاهد تجارية فائقة الدقة + أوامر الفيديو السينمائية (عطر العود الملكي)"
+                  : "4 commercial ad scenes + video motion prompts (Oud Royale)"}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onViewDemoProject}
+            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <span>{lang === "ar" ? "معاينة المشاهد الإعلانية الآن" : "Preview Ad Scenes Now"}</span>
+            <ArrowRight className={`w-3.5 h-3.5 ${lang === "ar" ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      )}
 
       {/* Main Drag & Drop Card */}
       <div
