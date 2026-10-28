@@ -84,7 +84,14 @@ export async function GET(req: NextRequest) {
         let fileBuffer: Buffer | null = null;
         let ext = "png";
 
-        if (scene.activeImageUrl.startsWith("/uploads/") || scene.activeImageUrl.startsWith("/demo/")) {
+        if (scene.activeImageUrl.startsWith("data:")) {
+          const match = scene.activeImageUrl.match(/^data:([^;]+);base64,(.+)$/);
+          if (match) {
+            const mime = match[1];
+            ext = mime.includes("svg") ? "svg" : mime.includes("webp") ? "webp" : mime.includes("jpeg") || mime.includes("jpg") ? "jpg" : "png";
+            fileBuffer = Buffer.from(match[2], "base64");
+          }
+        } else if (scene.activeImageUrl.startsWith("/uploads/") || scene.activeImageUrl.startsWith("/demo/")) {
           const filePath = path.join(process.cwd(), "public", scene.activeImageUrl);
           try {
             fileBuffer = await fs.readFile(filePath);

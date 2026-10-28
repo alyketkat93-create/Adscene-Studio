@@ -18,15 +18,32 @@ export class LocalStorageProvider implements IStorageProvider {
     }
   }
 
-  async saveFile(buffer: Buffer, filename: string, _mimeType: string): Promise<string> {
-    await this.ensureDir();
-    const cleanFilename = `${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-    const filePath = path.join(this.uploadDir, cleanFilename);
-    await fs.writeFile(filePath, buffer);
-    return `/uploads/${cleanFilename}`;
+  async saveFile(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
+    // In Vercel serverless environment, filesystem is read-only (EROFS)
+    // Using Data URI guarantees zero filesystem dependency, instant rendering, and multi-container persistence
+    if (process.env.VERCEL === "1") {
+      const cleanMime = mimeType || "image/jpeg";
+      return `data:${cleanMime};base64,${buffer.toString("base64")}`;
+    }
+
+    try {
+      await this.ensureDir();
+      const cleanFilename = `${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+      const filePath = path.join(this.uploadDir, cleanFilename);
+      await fs.writeFile(filePath, buffer);
+      return `/uploads/${cleanFilename}`;
+    } catch (e: any) {
+      console.warn("Storage write failed (e.g. read-only filesystem), falling back to Data URI:", e?.message);
+      const cleanMime = mimeType || "image/jpeg";
+      return `data:${cleanMime};base64,${buffer.toString("base64")}`;
+    }
   }
 
   async getFile(fileUrl: string): Promise<Buffer> {
+    if (fileUrl.startsWith("data:")) {
+      const b64 = fileUrl.replace(/^data:[^;]+;base64,/, "");
+      return Buffer.from(b64, "base64");
+    }
     const filename = path.basename(fileUrl);
     const filePath = path.join(this.uploadDir, filename);
     return await fs.readFile(filePath);

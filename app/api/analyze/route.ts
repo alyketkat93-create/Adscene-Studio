@@ -48,14 +48,20 @@ export async function POST(req: NextRequest) {
 
     // Read asset buffer
     let imageBase64 = "";
-    if (originalAsset.url.startsWith("/demo/")) {
+    if (originalAsset.url.startsWith("data:")) {
+      imageBase64 = originalAsset.url;
+    } else if (originalAsset.url.startsWith("/demo/")) {
       const demoFilePath = path.join(process.cwd(), "public", originalAsset.url);
       const buffer = await fs.readFile(demoFilePath);
       imageBase64 = buffer.toString("base64");
     } else if (originalAsset.url.startsWith("/uploads/")) {
-      const uploadFilePath = path.join(process.cwd(), "public", originalAsset.url);
-      const buffer = await fs.readFile(uploadFilePath);
-      imageBase64 = buffer.toString("base64");
+      try {
+        const uploadFilePath = path.join(process.cwd(), "public", originalAsset.url);
+        const buffer = await fs.readFile(uploadFilePath);
+        imageBase64 = buffer.toString("base64");
+      } catch (e) {
+        console.warn("Could not read local upload file:", e);
+      }
     }
 
     const vision = getVisionProvider();
